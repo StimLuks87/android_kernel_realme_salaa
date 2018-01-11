@@ -179,9 +179,6 @@ HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(srctree)/$(src)/check.sh $(HOSTCC)
 HOSTCFLAGS_zconf.lex.o	:= -I$(src)
 HOSTCFLAGS_zconf.tab.o	:= -I$(src)
 
-LEX_PREFIX_zconf	:= zconf
-YACC_PREFIX_zconf	:= zconf
-
 # nconf: Used for the nconfig target based on ncurses
 hostprogs-y	+= nconf
 nconf-objs	:= nconf.o zconf.tab.o nconf.gui.o
