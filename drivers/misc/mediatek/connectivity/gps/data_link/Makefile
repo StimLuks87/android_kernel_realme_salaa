@@ -10,7 +10,6 @@
 # published by the Free Software Foundation.
 
 ###############################################################################
-# Necessary Check
 $(warning build in gps_dl)
 ifeq ($(CONFIG_MTK_GPS_SUPPORT), y)
 

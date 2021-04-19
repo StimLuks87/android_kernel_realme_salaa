@@ -10,7 +10,6 @@
 # published by the Free Software Foundation.
 
 ###############################################################################
-# Necessary Check
 ifeq ($(CONFIG_MTK_GPS_SUPPORT), y)
 
 ifndef TOP
