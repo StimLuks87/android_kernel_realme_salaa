@@ -53,14 +53,14 @@ extern int fg_read_dts_val(const struct device_node *np, const char *node_srting
 int __attribute__ ((weak))
 IMM_IsAdcInitReady(void)
 {
-	pr_notice("E_WF: %s doesn't exist\n", __func__);
+	pr_err("E_WF: %s doesn't exist\n", __func__);
 	return 0;
 }
 
 int __attribute__ ((weak))
 IMM_GetOneChannelValue(int dwChannel, int data[4], int *rawdata)
 {
-	pr_notice("E_WF: %s doesn't exist\n", __func__);
+	pr_err("E_WF: %s doesn't exist\n", __func__);
 	return -1;
 }
 #endif
@@ -113,7 +113,7 @@ do {                                    \
 } while (0)
 
 #define mtkts_btsmdpa_printk(fmt, args...) \
-pr_notice("[Thermal/TZ/BTSMDPA]" fmt, ##args)
+pr_debug("[Thermal/TZ/BTSMDPA]" fmt, ##args)
 
 
 #if defined(CONFIG_MEDIATEK_MT6577_AUXADC)
@@ -1220,7 +1220,7 @@ void mtkts_btsmdpa_prepare_table(int table_num)
 		break;
 	}
 
-	pr_notice("[Thermal/TZ/BTSMDPA] %s table_num=%d\n",
+	pr_debug("[Thermal/TZ/BTSMDPA] %s table_num=%d\n",
 						__func__, table_num);
 
 #if 0
@@ -1230,10 +1230,10 @@ void mtkts_btsmdpa_prepare_table(int table_num)
 		for (i = 0; i < (ntc_tbl_size
 					/ sizeof(struct BTSMDPA_TEMPERATURE));
 		     i++) {
-			pr_notice(
+			pr_debug(
 				"BTSMDPA_Temperature_Table[%d].APteryTemp =%d\n",
 				i, BTSMDPA_Temperature_Table[i].BTSMDPA_Temp);
-			pr_notice(
+			pr_debug(
 				"BTSMDPA_Temperature_Table[%d].TemperatureR=%d\n",
 				i, BTSMDPA_Temperature_Table[i].TemperatureR);
 		}

@@ -45,14 +45,14 @@
 int __attribute__ ((weak))
 IMM_IsAdcInitReady(void)
 {
-	pr_notice("E_WF: %s doesn't exist\n", __func__);
+	pr_err("E_WF: %s doesn't exist\n", __func__);
 	return 0;
 }
 
 int __attribute__ ((weak))
 IMM_GetOneChannelValue(int dwChannel, int data[4], int *rawdata)
 {
-	pr_notice("E_WF: %s doesn't exist\n", __func__);
+	pr_err("E_WF: %s doesn't exist\n", __func__);
 	return -1;
 }
 #endif
@@ -1177,9 +1177,7 @@ void mtkts_flashlight_prepare_table(int table_num)
 		ntc_tbl_size = sizeof(FLASHLIGHT_Temperature_Table4);
 		break;
 	}
-
-	pr_notice("[Thermal/TZ/FLASHLIGHT] %s table_num=%d\n", __func__, table_num);
-
+	pr_debug("[Thermal/TZ/FLASHLIGHT] %s table_num=%d\n", __func__, table_num);
 #if 0
 	{
 		int i = 0;
@@ -1187,10 +1185,10 @@ void mtkts_flashlight_prepare_table(int table_num)
 		for (i = 0; i < (ntc_tbl_size
 					/ sizeof(struct FLASHLIGHT_TEMPERATURE));
 		     i++) {
-			pr_notice(
+			pr_debug(
 				"FLASHLIGHT_Temperature_Table[%d].APteryTemp =%d\n",
 				i, FLASHLIGHT_Temperature_Table[i].FLASHLIGHT_Temp);
-			pr_notice(
+			pr_debug(
 				"FLASHLIGHT_Temperature_Table[%d].TemperatureR=%d\n",
 				i, FLASHLIGHT_Temperature_Table[i].TemperatureR);
 		}
