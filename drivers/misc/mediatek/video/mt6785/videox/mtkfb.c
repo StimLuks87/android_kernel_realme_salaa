@@ -450,8 +450,10 @@ static int mtkfb_blank(int blank_mode, struct fb_info *info)
 		/* #ifdef OPLUS_FEATURE_AOD */
 		mutex_lock(&fb_pow_mod_lock);
 		/* #endif */ /* OPLUS_FEATURE_AOD */
-		primary_display_set_power_mode(FB_SUSPEND);
-		mtkfb_early_suspend();
+		if (prev_pm != FB_SUSPEND) {
+			primary_display_set_power_mode(FB_SUSPEND);
+			mtkfb_early_suspend();
+		}
 
 		debug_print_power_mode_check(prev_pm, FB_SUSPEND);
 		/* #ifdef OPLUS_FEATURE_AOD */
