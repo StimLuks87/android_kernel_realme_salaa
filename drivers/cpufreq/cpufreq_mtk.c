@@ -29,112 +29,42 @@
 static struct kobj_attribute _name##_attr =			\
 __ATTR(_name, 0644, show_##_name, store_##_name)
 
-/* cpu frequency table from cpufreq dt parse */
-static struct cpufreq_frequency_table* cpuftbl[2];
-
 static struct ppm_limit_data *current_cpu_freq;
 
 extern int set_sched_boost(unsigned int val);
 
 DEFINE_MUTEX(cpufreq_mtk_mutex);
 
-struct cpufreq_mtk_topo_config {
-    unsigned int ltl_cpu_start;
-    unsigned int big_cpu_start;
-};
-
-#if defined(CONFIG_MACH_MT6768)
-static const struct cpufreq_mtk_topo_config topology = {
-    .ltl_cpu_start			= 0,
-    .big_cpu_start			= 6,
-};
-#endif
-
-void cpufreq_mtk_set_table(int cpu, struct cpufreq_frequency_table *ftbl)
+/* Sets current minimum CPU frequency */
+void set_min_cpu_freq(int cluster, int new_cpu_freq)
 {
-	if ( cpu == topology.big_cpu_start )
-		cpuftbl[BIG] = ftbl;
-	else if ( cpu == topology.ltl_cpu_start )
-		cpuftbl[LITTLE] = ftbl;
-}
-EXPORT_SYMBOL_GPL(cpufreq_mtk_set_table);
-
-int check_cpu_freq(int cluster, int freq) {
-    struct cpufreq_frequency_table *pos;
-
-    /* 
-     * Allow -1 frequency as that is
-     * used to remove the limit.
-     */
-    if (freq == -1)
-        return 0;
-
-    cpufreq_for_each_valid_entry(pos, cpuftbl[cluster]) {
-        if (pos->frequency == freq)
-            return 0;
-    }
-
-    return -EINVAL;
-}
-
-/* Updates CPU frequency for chosen cluster */
-void update_cpu_freq(int cluster)
-{
+    current_cpu_freq[cluster].min = new_cpu_freq;
 
 #ifdef CONFIG_MTK_SCHED_BOOST
-    int sched_boost_type = (current_cpu_freq[cluster].min > 0 || current_cpu_freq[cluster].max > 0)
-                            ? SCHED_ALL_BOOST : SCHED_NO_BOOST;
-
-    set_sched_boost(sched_boost_type);
+    if (new_cpu_freq > 0)
+        set_sched_boost(SCHED_ALL_BOOST);
+    else
+        set_sched_boost(SCHED_NO_BOOST);
 #endif
 
     update_userlimit_cpu_freq(CPU_KIR_PERF, CLUSTER_NUM, current_cpu_freq);
 }
 
 /* Sets current maximum CPU frequency */
-int set_max_cpu_freq(int cluster, int max)
+void set_max_cpu_freq(int cluster, int new_cpu_freq)
 {
-    int ret;
-    struct cpufreq_frequency_table *pos;
+    current_cpu_freq[cluster].max = new_cpu_freq;
 
-    ret = check_cpu_freq(cluster, max);
-    if (ret < 0)
-        goto out;
+#ifdef CONFIG_MTK_SCHED_BOOST
+    if (new_cpu_freq > 0)
+        set_sched_boost(SCHED_ALL_BOOST);
+    else
+        set_sched_boost(SCHED_NO_BOOST);
+#endif
 
-    if (max < current_cpu_freq[cluster].min && current_cpu_freq[cluster].min > 0) {
-        pr_err("[%s] Max freq cannot be lower than min freq!\n", __func__);
-        ret = -EINVAL;
-        goto out;
-    }
-
-    current_cpu_freq[cluster].max = max > 0 ? max : -1;
-    update_cpu_freq(cluster);
-
-out:
-    return ret;
+    update_userlimit_cpu_freq(CPU_KIR_PERF, CLUSTER_NUM, current_cpu_freq);
 }
 
-/* Sets current minimum CPU frequency */
-int set_min_cpu_freq(int cluster, int min)
-{
-    int ret;
-
-    ret = check_cpu_freq(cluster, min);
-    if (ret < 0)
-        goto out;
-
-    if (min > current_cpu_freq[cluster].max && current_cpu_freq[cluster].max > 0) {
-        pr_err("[%s] Min freq cannot be higher than max freq!\n", __func__);
-        ret = -EINVAL;
-        goto out;
-    }
-
-    current_cpu_freq[cluster].min = min > 0 ? min : -1;
-    update_cpu_freq(cluster);
-
-out:
-    return ret;
-}
 
 static ssize_t show_lcluster_min_freq(struct kobject *kobj,
 					struct kobj_attribute *attr, char *buf)
@@ -153,11 +83,8 @@ static ssize_t store_lcluster_min_freq(struct kobject *kobj,
         return -EINVAL;
 
     mutex_lock(&cpufreq_mtk_mutex);
-    ret = set_min_cpu_freq(LITTLE, new_freq);
+    set_min_cpu_freq(LITTLE, new_freq);
     mutex_unlock(&cpufreq_mtk_mutex);
-
-    if (ret < 0)
-        return ret;
 
     return count;
 }
@@ -181,11 +108,8 @@ static ssize_t store_lcluster_max_freq(struct kobject *kobj,
         return -EINVAL;
 
     mutex_lock(&cpufreq_mtk_mutex);
-    ret = set_max_cpu_freq(LITTLE, new_freq);
+    set_max_cpu_freq(LITTLE, new_freq);
     mutex_unlock(&cpufreq_mtk_mutex);
-
-    if (ret < 0)
-        return ret;
 
     return count;
 }
@@ -210,11 +134,8 @@ static ssize_t store_bcluster_min_freq(struct kobject *kobj,
         return -EINVAL;
 
     mutex_lock(&cpufreq_mtk_mutex);
-    ret = set_min_cpu_freq(BIG, new_freq);
+    set_min_cpu_freq(BIG, new_freq);
     mutex_unlock(&cpufreq_mtk_mutex);
-
-    if (ret < 0)
-        return ret;
 
     return count;
 }
@@ -239,11 +160,8 @@ static ssize_t store_bcluster_max_freq(struct kobject *kobj,
         return -EINVAL;
 
     mutex_lock(&cpufreq_mtk_mutex);
-    ret = set_max_cpu_freq(BIG, new_freq);
+    set_max_cpu_freq(BIG, new_freq);
     mutex_unlock(&cpufreq_mtk_mutex);
-
-    if (ret < 0)
-        return ret;
 
     return count;
 }
@@ -260,38 +178,41 @@ static struct attribute *mtk_param_attributes[] = {
 
 static struct attribute_group mtk_param_attr_group = {
     .attrs = mtk_param_attributes,
-    .name = "mtk",
+    .name = "cpufreq_mtk",
 };
 
 static int __init cpufreq_mtk_init(void)
 {
-    int ret;
+    int ret = 0;
+
+    pr_info("%s: Driver loading.\n", __func__);
 
     current_cpu_freq = kcalloc(CLUSTER_NUM, sizeof(struct ppm_limit_data), GFP_KERNEL);
 
     if (!current_cpu_freq) {
-        pr_err("[%s] Could not allocate memory for current_cpu_freq!\n", __func__);
+        pr_err("%s: Could not allocate memory for current_cpu_freq!\n", __func__);
         ret = -ENOMEM;
         goto out;
     }
 
-    current_cpu_freq[LITTLE].min = -1;
-    current_cpu_freq[BIG].min = -1;
-    current_cpu_freq[LITTLE].max = -1;
-    current_cpu_freq[BIG].max = -1;
+    current_cpu_freq[LITTLE].min = -1; // No limit
+    current_cpu_freq[BIG].min = -1; // No limit
+    current_cpu_freq[LITTLE].max = -1; // No limit
+    current_cpu_freq[BIG].max = -1; // No limit
 
     if (!cpufreq_global_kobject) {
-        pr_err("[%s] !cpufreq_global_kobject\n", __func__);
+        pr_err("%s: !cpufreq_global_kobject\n", __func__);
         ret = -ENODEV;
         goto out;
     }
 
     ret = sysfs_create_group(cpufreq_global_kobject, &mtk_param_attr_group);
     if (ret) {
-        pr_err("[%s] sysfs_create_group failed!\n", __func__);
-        ret = -ENOMEM;
+        pr_err("%s: sysfs_create_group failed!\n", __func__);
         goto out;
     }
+
+    pr_info("%s: Driver init done!\n", __func__);
 
 out:
     return ret;
@@ -299,7 +220,7 @@ out:
 
 static void __exit cpufreq_mtk_exit(void)
 {
-    pr_debug("[%s] Driver unloading.", __func__);
+    pr_debug("%s: Driver unloading.", __func__);
     sysfs_remove_group(cpufreq_global_kobject, &mtk_param_attr_group);
     kfree(current_cpu_freq);
 }
