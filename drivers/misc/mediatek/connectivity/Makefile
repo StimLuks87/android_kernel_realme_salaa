@@ -54,30 +54,27 @@ endif
         export WLAN_CHIP_ID=6785
         export MTK_ANDROID_WMT=y
         export MTK_ANDROID_EMI=y
-
         export WIFI_IP_SET=2
         export WIFI_ECO_VER=1
-
         export CFG_FM_CHIP_ID=6785
         export CFG_FM_CHIP=mt6631
+        export CONNAC_VER=1_0
+        export CFG_BUILD_CONNAC2=false
+        export MTK_WLAN_SERVICE=yes
+        export BT_PLATFORM=6785
 
         # Do build-in for xxx.c checking
         subdir-ccflags-y += -D MTK_WCN_REMOVE_KERNEL_MODULE
         subdir-ccflags-y += -D MTK_WCN_BUILT_IN_DRIVER
-        obj-y += common/
-        obj-y += wlan/adaptor/
-        obj-y += wlan/core/gen4m/
 
-	# FMRadio
-	obj-$(CONFIG_MTK_FMRADIO) += fmradio/
-
+        obj-$(CONFIG_MTK_COMBO) += common/
+        obj-$(CONFIG_MTK_COMBO_WIFI) += wlan/adaptor/
+        obj-$(CONFIG_MTK_COMBO_CHIP_CONSYS_6785) += wlan/core/gen4m/
+        obj-$(CONFIG_MTK_COMBO_BT) += bt/mt66xx/wmt/
+        obj-$(CONFIG_MTK_COMBO_GPS) += gps/
+        obj-$(CONFIG_MTK_FMRADIO) += fmradio/
+        obj-$(CONFIG_MTK_CONNFEM) += connfem/
     endif
-
-# Bluetooth
-obj-$(CONFIG_MTK_COMBO_BT) += bt/mt66xx/wmt/
-
-# GPS
-obj-$(CONFIG_MTK_COMBO_GPS) += gps/
 
 # Otherwise we were called directly from the command line;
 # invoke the kernel build system.
