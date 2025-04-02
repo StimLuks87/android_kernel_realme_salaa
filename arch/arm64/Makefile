@@ -202,6 +202,7 @@ all:	Image.gz $(KBUILD_DTBS) $(subst $\",,$(CONFIG_BUILD_ARM64_APPENDED_KERNEL_I
 MTK_PLATFORM := $(CONFIG_MTK_PLATFORM:"%"=%)
 MTK_PROJECT := $(CONFIG_ARCH_MTK_PROJECT:"%"=%)
 export MTK_PLATFORM MTK_PROJECT
+-include $(srctree)/scripts/drvgen/drvgen.mk
 
 KBUILD_DTBO_IMG := dtbo.img
 
