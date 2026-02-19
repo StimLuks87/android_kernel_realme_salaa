@@ -1015,23 +1015,23 @@ static int st21nfc_parse_dt(struct device *dev,
 #endif  // ST21NFCD_MTK
 
 static int st21nfc_probe(struct i2c_client *client,
-                         const struct i2c_device_id *id) {
-  pr_info("%s : st21nfc_probe start\n", __func__);
-
-  int ret;
+                         const struct i2c_device_id *id)
+{
   struct st21nfc_device *st21nfc_dev;
   struct device *dev = &client->dev;
 #ifdef ST21NFCD_MTK
   struct device_node *np = dev->of_node;
   struct st21nfc_i2c_platform_data *platform_data;
-#endif  // ST21NFCD_MTK
-  //Zhou.Zheng@CN.NFC.Basic.Hardware,2674926, 2019/12/16,
-  //Add for : ST NXP chip common software
+#endif
+
+  int ret;
+
+  dev_info(dev, "st21nfc_probe start\n");
+
   CHECK_NFC_CHIP(ST21H);
-  //#endif
 
   if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-    pr_err("%s : need I2C_FUNC_I2C\n", __func__);
+	dev_err(dev, "need I2C_FUNC_I2C\n");
     return -ENODEV;
   }
 
