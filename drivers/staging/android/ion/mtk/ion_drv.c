@@ -441,7 +441,7 @@ static long ion_sys_cache_sync(struct ion_client *client,
 	unsigned long kernel_va = 0;
 	unsigned long kernel_size = 0;
 	struct sg_table *table;
-	struct ion_heap *heap = NULL;
+	struct ion_heap *heap __maybe_unused = NULL;
 	int is_kernel_addr = from_kernel;
 
 	/* Get kernel handle
