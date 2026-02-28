@@ -121,7 +121,7 @@ config MMC_FFU
 	  This is must to upgrade the eMMC FW.
 
 config MMC_EMBEDDED_SDIO
-	boolean "MMC embedded SDIO device support"
+	bool "MMC embedded SDIO device support"
 	help
 	  If you say Y here, support will be added for embedded SDIO
 	  devices which do not contain the necessary enumeration
