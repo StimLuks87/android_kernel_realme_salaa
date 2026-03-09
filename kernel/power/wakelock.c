@@ -270,7 +270,7 @@ int pm_wake_unlock(const char *buf)
 
 	wl = wakelock_lookup_add(buf, len, false);
 	if (IS_ERR(wl)) {
-		ret = PTR_ERR(wl);
+		ret = 0;
 		goto out;
 	}
 	__pm_relax(wl->ws);
