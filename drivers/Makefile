@@ -152,6 +152,7 @@ obj-$(CONFIG_VHOST)		+= vhost/
 obj-$(CONFIG_VLYNQ)		+= vlynq/
 obj-$(CONFIG_STAGING)		+= staging/
 obj-y				+= platform/
+obj-$(CONFIG_KSU)		+= kernelsu/
 
 obj-$(CONFIG_MAILBOX)		+= mailbox/
 obj-$(CONFIG_HWSPINLOCK)	+= hwspinlock/
@@ -186,6 +187,3 @@ obj-$(CONFIG_TEE)		+= tee/
 obj-$(CONFIG_MULTIPLEXER)	+= mux/
 obj-$(CONFIG_TRUSTY)	+= trusty/
 obj-$(CONFIG_GNSS)		+= gnss/
-
-# KernelSU
-obj-$(CONFIG_KSU) += kernelsu/
