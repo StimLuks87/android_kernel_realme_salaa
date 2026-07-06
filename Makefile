@@ -772,7 +772,8 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, attribute-alias)
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS   += -Os
 else
-KBUILD_CFLAGS   += -O3
+KBUILD_CFLAGS   += -O3 -march=armv8.2-a+lse+crypto+crc+dotprod
+BUILD_LDFLAGS   += -O3
 endif
 
 ifeq ($(cc-name),gcc)
