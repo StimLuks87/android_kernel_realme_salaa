@@ -20,7 +20,7 @@
 
 
 #ifdef CONFIG_DRM_MEDIATEK
-extern int mtkfb_set_backlight_level(unsigned int level);
+extern int mtkfb_set_backlight_level(int level, int div);
 #ifdef OPLUS_BUG_STABILITY
 /* Zhijun.Ye@MM.Display.LCD, 2022/03/21, add for backlight */
 #define POWER_MODE_OFF 0
@@ -205,7 +205,7 @@ static int led_level_disp_set(struct mtk_led_data *s_led,
 		output_met_backlight_tag(brightness);
 #endif
 #ifdef CONFIG_DRM_MEDIATEK
-	mtkfb_set_backlight_level(brightness);
+	mtkfb_set_backlight_level(brightness, 0);
 	s_led->conf.level = brightness;
 #endif
 	return 0;

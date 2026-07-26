@@ -372,7 +372,7 @@ static int readcount = 0;
 extern int panel_serial_number_read(struct drm_crtc *crtc, char cmd, int num);
 #endif /*OPLUS_BUG_STABILITY*/
 extern int mtk_drm_setbacklight(struct drm_crtc *crtc, unsigned int level);
-int mtkfb_set_backlight_level(unsigned int level)
+int mtkfb_set_backlight_level(int level, int div)
 {
 	struct drm_crtc *crtc;
 
@@ -2138,7 +2138,7 @@ static void process_dbg_opt(const char *opt)
 			return;
 		}
 
-		mtkfb_set_backlight_level(level);
+		mtkfb_set_backlight_level(level, 0);
 	} else if (!strncmp(opt, "aod_bl:", 7)) {
 		unsigned int level;
 		int ret;
