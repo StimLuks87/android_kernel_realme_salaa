@@ -1227,7 +1227,7 @@ static int _rdma_partial_update(enum DISP_MODULE_ENUM module, void *arg,
 }
 
 int rdma_ioctl(enum DISP_MODULE_ENUM module, void *cmdq_handle,
-	       unsigned int ioctl_cmd, unsigned long *params)
+	       unsigned int ioctl_cmd, void *params)
 {
 	int ret = 0;
 	enum DDP_IOCTL_NAME ioctl = (enum DDP_IOCTL_NAME)ioctl_cmd;
@@ -1311,7 +1311,6 @@ struct DDP_MODULE_DRIVER ddp_driver_rdma = {
 	.build_cmdq = rdma_build_cmdq,
 	.set_lcm_utils = NULL,
 	.enable_irq = rdma_enable_irq,
-	.ioctl = (int (*)(enum DISP_MODULE_ENUM, void *,
-			  enum DDP_IOCTL_NAME, void *))rdma_ioctl,
+	.ioctl = rdma_ioctl,
 	.switch_to_nonsec = NULL,
 };
