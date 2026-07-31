@@ -403,6 +403,7 @@ static int get_devinfo(void)
 	 */
 
 #if ENABLE_LOO_B
+#ifdef CONFIG_MTK_AEE_FEATURE
 	/* Big_Hi */
 	aee_rr_rec_ptp_cpu_2_little_volt(pi_efuse_idx[3].orig_mbb);
 
@@ -410,6 +411,8 @@ static int get_devinfo(void)
 	aee_rr_rec_ptp_cpu_2_little_volt_1(pi_efuse_idx[4].orig_mbb);
 #endif
 #endif
+#endif
+
 
 #ifdef CONFIG_EEM_AEE_RR_REC
 	aee_rr_rec_ptp_e0((unsigned int)val[0]);
