@@ -55,7 +55,7 @@
 		SNDRV_PCM_FMTBIT_S24_LE | \
 		SNDRV_PCM_FMTBIT_S32_LE)
 
-#define TF98XX_MAX_DSP_START_TRY_COUNT	10
+#define TF98XX_MAX_DSP_START_TRY_COUNT	40
 
 /* data accessible by all instances */
 /* Memory pool used for DSP messages */
@@ -2267,7 +2267,7 @@ static void tfa98xx_dsp_init(struct tfa98xx *tfa98xx)
 		/* reschedule this init work for later */
 		queue_delayed_work(tfa98xx->tfa98xx_wq,
 						&tfa98xx->init_work,
-						msecs_to_jiffies(5));
+						msecs_to_jiffies(20));
 		tfa98xx->init_count++;
 	}
 	if (failed) {
@@ -2393,8 +2393,21 @@ static int tfa98xx_startup(struct snd_pcm_substream *substream,
 	}
 
 	if (tfa98xx->dsp_fw_state != TFA98XX_DSP_FW_OK) {
-		pr_info("%s(), Container file not loaded\n", __func__);
-		return -EINVAL;
+		/* Container load/probe failed earlier (or the DSP handshake
+		 * never recovered) and left this device permanently gated.
+		 * A fresh stream open is a legitimate new attempt: retry the
+		 * container load/probe once instead of failing forever.
+		 */
+		dev_warn(codec->dev,
+			"dsp_fw_state=%d, retrying container load/probe\n",
+			tfa98xx->dsp_fw_state);
+		tfa98xx_load_container(tfa98xx);
+
+		if (tfa98xx->dsp_fw_state != TFA98XX_DSP_FW_OK) {
+			dev_info(codec->dev, "Container file not loaded\n");
+			pr_info("Container file not loaded\n");
+			return -EINVAL;
+		}
 	}
 
 	basename = kzalloc(MAX_CONTROL_NAME, GFP_KERNEL);
